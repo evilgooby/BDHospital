@@ -23,21 +23,20 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_Add_clicked();
+    void on_Add_clicked();      // Добавление данных в таблицу
 
-    void on_update_clicked();
+    void on_update_clicked();   // Обновление таблицы(проверка зафиксировались ли данные в БД)
 
-    void on_tableView_clicked(const QModelIndex &index);
+    void on_tableView_clicked(const QModelIndex &index);    // Взятие индекса с нажатой строки
 
-    void on_Search_clicked();
+    void on_Search_clicked();   // Поиск
 
-    void on_reset_clicked();
+    void on_reset_clicked();    // Сброс фильтра на поиск
 
 private:
-    Ui::MainWindow *ui; // Создания обьекта окна
-    QSqlDatabase db;    //
+    Ui::MainWindow *ui;
+    QSqlDatabase db;
     QSqlQuery *query;
-    //QSqlTableModel *model;
     CustomSqlTableModel *model;
 
     int currentRow;

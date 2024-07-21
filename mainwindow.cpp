@@ -16,12 +16,13 @@ MainWindow::MainWindow(QWidget *parent)
         ui->statusbar->showMessage("При  подключились к базе данных произошла ошибка" );
     }
     query = new QSqlQuery(db);
+
     // Создание базы данных на локальном диске(если она уже существует то функция не будет вызвана)
     query->exec("CREATE TABLE HospitalBD (ID INTEGER PRIMARY KEY, date TEXT NOT NULL CHECK(date LIKE '__.__.____'), FIO TEXT NOT NULL CHECK(FIO != ''), birth_date	TEXT NOT NULL CHECK(birth_date LIKE '__.__.____'), research	TEXT NOT NULL CHECK(research != '-'), mSv INTEGER NOT NULL CHECK(mSv != '' AND typeof(mSv) = 'real'));");
     model = new CustomSqlTableModel(this, db);
-    //model = new QSqlTableModel(this, db);
     model->setTable("HospitalBD");
     model->select();
+
     // установка нормальных названий колонок в таблице
     model->setHeaderData(0, Qt::Horizontal, "ID", Qt::DisplayRole);
     model->setHeaderData(1, Qt::Horizontal, "Дата исследования", Qt::DateFormat());
@@ -50,11 +51,17 @@ void MainWindow::on_Add_clicked() // добавление данных в таб
    QSqlQuery query = QSqlQuery(db);
    query.prepare("INSERT INTO HospitalBD (date, FIO, birth_date, research, mSv)"
                  "VALUES(:dateValue,:FIOValue,:birth_dateValue,:researchValue,:mSvValue)");
-   /*QString str1 = ui->dateEdit->text();
-   QString str2 = ui->lineEdit_2->text();
-   QString str3 = ui->dateEdit_2->text();
-   QString str4 = ui->comboBox->currentText();
-   QString str5 = ui->lineEdit_4->text();*/
+   QString err;
+
+   if(ui->lineEdit_2->text() == ""){
+       err += "  Ошибка: Не введены данные в графу ФИО  ";
+   }
+   if(ui->comboBox->currentText() == "-"){
+       err += "  Ошибка: Выбрана не верная область исследования  ";
+   }
+   if(ui->lineEdit_4->text() == "0.00" || ui->lineEdit_4->text() == "0.0" || ui->lineEdit_4->text() == "0." || ui->lineEdit_4->text() == "."  ){
+        err += "  Ошибка: Выбрана не верная ЭЭД  ";
+   }
 
    QDateTime currentDateTime = QDateTime::currentDateTime();
    query.bindValue(":dateValue", currentDateTime.toString("dd.MM.yyyy"));
@@ -64,7 +71,7 @@ void MainWindow::on_Add_clicked() // добавление данных в таб
    query.bindValue(":mSvValue", ui->lineEdit_4->text());
    if (!query.exec())
    {
-        ui->statusbar->showMessage("Не удалось добавить данные в базу");
+        ui->statusbar->showMessage("Не удалось добавить данные в базу" + err);
    }
    else{
         ui->statusbar->showMessage("Данные добавлены успешно!");
